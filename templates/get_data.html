@@ -55,6 +55,7 @@
         _start = new Date("{{ start }}")
         _end = new Date("{{ end }}")
         _middle = new Date("{{ middle }}")
+        _region_title = "{{ region_title_info }}"
 
         _start_str =
             ("0" + _start.getDate()).slice(-2) + "/" +
@@ -78,7 +79,7 @@
                 zoomType: 'x'
             },
             title: {
-                text: 'Cas de COVID-19 en France, entre le ' + _start_str + " et le " + _end_str
+                text: 'Cas de COVID-19 ' + _region_title + ', entre le ' + _start_str + " et le " + _end_str
             },
             subtitle: {
                 text: document.ontouchstart === undefined ?

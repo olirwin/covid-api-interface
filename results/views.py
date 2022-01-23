@@ -9,6 +9,7 @@ from datetime import date, timedelta, datetime
 
 from .forms import ChooseParamsDataForm
 from .models import Region
+from .utils import make_timestamp, construct_title
 
 
 load_dotenv()
@@ -33,10 +34,6 @@ class HomePageView(View) :
         data = json.loads(response.content.decode("UTF-8"))
         data_points = data["body"]["data"]
 
-        def make_timestamp(from_date : str) -> int :
-            str_date = datetime.strptime(from_date, "%Y-%m-%d")
-            return int(str_date.timestamp() * 1000)
-
         existing = [[make_timestamp(el["date"]), el["cases"]] for el in data_points]
 
         context = {
@@ -53,7 +50,11 @@ class FetchDataView(View) :
     def get(self, request) :
 
         # Show form
-        form = ChooseParamsDataForm()
+        form = ChooseParamsDataForm(initial = {
+            "region" : Region.objects.filter(name = "France")[0].id,
+            "start_date" : date(2020, 6, 1),
+            "end_date" : date.today() + timedelta(days = 10)
+        })
 
         context = {
             "form" : form
@@ -92,10 +93,6 @@ class FetchDataView(View) :
             data = json.loads(response.content.decode("UTF-8"))
             data_points = data["body"]["data"]
 
-            def make_timestamp(from_date: str) -> int :
-                str_date = datetime.strptime(from_date, "%Y-%m-%d")
-                return int(str_date.timestamp() * 1000)
-
             predicted = [[make_timestamp(el["date"]), el["cases"]]
                          for el in data_points if el["predicted"]]
             existing  = [[make_timestamp(el["date"]), el["cases"]]
@@ -112,6 +109,7 @@ class FetchDataView(View) :
                 "end"      : end_date.strftime("%Y-%m-%d"),
                 "middle" : middle_date,
                 "data" : data,
-                "form" : form
+                "form" : form,
+                "region_title_info" : construct_title(region)
             }
             return render(request, template_name = "get_data.html", context = context)
