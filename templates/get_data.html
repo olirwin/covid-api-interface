@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <title>Récupération des données</title>
+{% endblock %}
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row justify-content-center">
+        {% if form %}
+        <div class="col-6 col-md-4">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="container-fluid mt-3">
+                    <div class="row my-3">
+                        <div class="col-3 col-md-1 mx-3">
+                            {{ form.region.label }}
+                        </div>
+                        <div class="col-6 col-md-4">
+                            {{ form.region }}
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col-3 col-md-1 mx-3">
+                            {{ form.start_date.label }}
+                        </div>
+                        <div class="col-6 col-md-4">
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-3 col-md-1 mx-3">
+                            {{ form.end_date.label }}
+                        </div>
+                        <div class="col-6 col-md-4">
+                            {{ form.end_date }}
+                        </div>
+                    </div>
+                    <input type="submit" value="Valider" class="btn btn-success mt-3">
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="row">
+    {% if data %}
+        <div id="chart"></div>
+    {% endif %}
+    </div>
+</div>
+
+{% if data %}
+<script>
+        _existing = {{ existing | safe }}
+        _predicted = {{ predicted | safe }}
+        _start = new Date("{{ start }}")
+        _end = new Date("{{ end }}")
+        _middle = new Date("{{ middle }}")
+
+        _start_str =
+            ("0" + _start.getDate()).slice(-2) + "/" +
+            ("0" + (_start.getMonth() + 1)).slice(-2) + "/" +
+            _start.getFullYear()
+
+        _end_str =
+            ("0" + _end.getDate()).slice(-2) + "/" +
+            ("0" + (_end.getMonth() + 1)).slice(-2) + "/" +
+            _end.getFullYear()
+
+        Highcharts.setOptions({
+            lang: {
+                decimalPoint: '.',
+                thousandsSep: ' '
+            }
+        });
+
+        Highcharts.chart('chart', {
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Cas de COVID-19 en France, entre le ' + _start_str + " et le " + _end_str
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                    'Cliquez et glissez pour zoomer' : 'Pincez l\'écran pour zoomer'
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Nombre de cas'
+                }
+            },
+            legend: {
+                enabled: true
+            },
+            tooltip : {
+            	formatter : function() {
+                    let str_y = this.y.toLocaleString("fr-FR")
+                    let tooltip = Highcharts.dateFormat('%d/%m/%Y', new Date(this.x));
+                    tooltip += '<br/><span style="color:' +
+                        this.color + '">\u25CF</span> ' +
+                        this.series.name + ' : ' +
+                        '<b style="color:' + this.color + '">' + str_y + '</b>';
+                    return tooltip;
+              }
+            },
+            series: [{
+                type: 'area',
+                name: 'Nombre de positifs',
+                data: _existing,
+                pointInterval: 24 * 3600 * 1000,
+                pointStart:_start,
+            },{
+                type: 'area',
+                name: 'Prédiction',
+                data: _predicted,
+                pointInterval: 24 * 3600 * 1000,
+                pointStart:_middle,
+                color: "#FF8600",
+            }]
+        });
+</script>
+{% endif %}
+{% endblock %}

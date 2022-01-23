@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}
+    <title>Accueil</title>
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div id="chart"></div>
+    </div>
+</div>
+
+<script>
+_existing = {{ existing | safe }}
+_start = new Date("{{ start }}")
+_end = new Date("{{ end }}")
+
+_start_str =
+    ("0" + _start.getDate()).slice(-2) + "/" +
+    ("0" + (_start.getMonth() + 1)).slice(-2) + "/" +
+    _start.getFullYear()
+
+_end_str =
+    ("0" + _end.getDate()).slice(-2) + "/" +
+    ("0" + (_end.getMonth() + 1)).slice(-2) + "/" +
+    _end.getFullYear()
+
+Highcharts.setOptions({
+    lang: {
+        decimalPoint: '.',
+        thousandsSep: ' '
+    }
+});
+
+        Highcharts.chart('chart', {
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Cas de COVID-19 en France, entre le ' + _start_str + " et le " + _end_str
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                    'Cliquez et glissez pour zoomer' : 'Pincez l\'écran pour zoomer'
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Nombre de cas'
+                }
+            },
+            legend: {
+                enabled: true
+            },
+            tooltip : {
+            	formatter : function() {
+                    let str_y = this.y.toLocaleString("fr-FR")
+                    let tooltip = Highcharts.dateFormat('%d/%m/%Y', new Date(this.x));
+                    tooltip += '<br/><span style="color:' +
+                        this.color + '">\u25CF</span> ' +
+                        this.series.name + ' : ' +
+                        '<b style="color:' + this.color + '">' + str_y + '</b>';
+                    return tooltip;
+              }
+            },
+            series: [{
+                type: 'area',
+                name: 'Nombre de positifs',
+                data: _existing,
+                pointInterval: 24 * 3600 * 1000,
+                pointStart:_start,
+            }]
+        });
+</script>
+
+{% endblock %}
