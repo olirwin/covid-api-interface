@@ -14,5 +14,3 @@ class ChooseParamsDataForm(forms.Form) :
     end_date = forms.DateField(label = "Au", widget = AdminDateWidget(
         attrs = {"class" : "form-control", "aria-label" : "Date de début"}),
                                required = True)
-
-    pass
