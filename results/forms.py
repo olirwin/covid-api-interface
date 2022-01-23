@@ -3,7 +3,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 from .models import Region
 
 
-class ChooseDepartureStationForm(forms.Form) :
+class ChooseParamsDataForm(forms.Form) :
     choices = [(region.id, region) for region in Region.objects.all()]
     region = forms.ChoiceField(label = "", widget = forms.Select(
             attrs = {"class" : "form-select", "aria-label" : "Choix de la région"}),
