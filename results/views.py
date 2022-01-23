@@ -51,7 +51,7 @@ class FetchDataView(View) :
 
         # Show form
         form = ChooseParamsDataForm(initial = {
-            "region" : Region.objects.filter(name = "France")[0],
+            "region" : Region.objects.filter(name = "France")[0].id,
             "start_date" : date(2020, 6, 1),
             "end_date" : date.today() + timedelta(days = 10)
         })
