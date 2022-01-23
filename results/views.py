@@ -96,6 +96,12 @@ class FetchDataView(View) :
                 str_date = datetime.strptime(from_date, "%Y-%m-%d")
                 return int(str_date.timestamp() * 1000)
 
+            def construct_title(region_code : str) -> str :
+                if region_code == "FRA" :
+                    return "en France"
+                else :
+                    return f"dans le {region_code}"
+
             predicted = [[make_timestamp(el["date"]), el["cases"]]
                          for el in data_points if el["predicted"]]
             existing  = [[make_timestamp(el["date"]), el["cases"]]
@@ -112,6 +118,7 @@ class FetchDataView(View) :
                 "end"      : end_date.strftime("%Y-%m-%d"),
                 "middle" : middle_date,
                 "data" : data,
-                "form" : form
+                "form" : form,
+                "region_title_info" : construct_title(region)
             }
             return render(request, template_name = "get_data.html", context = context)
