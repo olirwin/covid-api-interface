@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY",
 DEBUG = os.getenv("DEBUG")
 DEBUG = bool(DEBUG) if DEBUG else True
 
-ALLOWED_HOSTS = ["0", "localhost", "127.0.0.1", "bg-covid-staging.herokuapp.com"]
+ALLOWED_HOSTS = ["0", "localhost", "127.0.0.1", "bg-covid-staging.herokuapp.com", "bg-covid.herokuapp.com"]
 
 
 # Application definition
